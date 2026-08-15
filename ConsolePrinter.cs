@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Threading;
 
 public static class ConsolePrinter
 {
-    public static int LetterSpeed { get; set; } = 70;
-    public static int CommaDelay { get; set; } = 250;
-    public static int SentenceEndDelay { get; set; } = 250;
+    public static int LetterSpeed = 70;
+    public static int CommaDelay = 250;
+    public static int SentenceEndDelay = 250;
 
-    public static void Print(string text)
+    public static void PrintText(string text)
     {
         for (int i = 0; i < text.Length; i++)
         {
@@ -18,31 +19,35 @@ public static class ConsolePrinter
                 return;
             }
 
-            int delay = text[i] switch
+            if (text[i] == ',')
             {
-                ',' => CommaDelay,
-                '.' or '!' or '?' => SentenceEndDelay,
-                _ => LetterSpeed
-            };
-
-            System.Threading.Thread.Sleep(delay);
+                Thread.Sleep(CommaDelay);
+            }
+            else if (text[i] == '.' || text[i] == '!' || text[i] == '?')
+            {
+                Thread.Sleep(SentenceEndDelay);
+            }
+            else
+            {
+                Thread.Sleep(LetterSpeed);
+            }
         }
-    }
-
-    public static void WaitForKey(ConsoleKey key)
-    {
-        while (Console.ReadKey(true).Key != key) { }
     }
 
     public static int ReadInt(string prompt, int min, int max)
     {
         while (true)
         {
-            Print(prompt);
-            if (int.TryParse(Console.ReadLine(), out int value) && value >= min && value <= max)
-                return value;
+            PrintText(prompt);
 
-            Print("Enter a valid number!");
+            if (int.TryParse(Console.ReadLine(), out int value) &&
+                value >= min &&
+                value <= max)
+            {
+                return value;
+            }
+
+            PrintText("Enter a valid number!");
         }
     }
 }

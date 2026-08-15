@@ -2,66 +2,72 @@
 
 public class GuessNumberGame
 {
-    private readonly Random _random = new();
+    int[] easy = { 1, 100 };
+    int[] medium = { 1, 1000 };
+    int[] hard = { 1, 10000 };
 
-    private readonly int[] _easy = { 1, 100 };
-    private readonly int[] _medium = { 1, 1000 };
-    private readonly int[] _hard = { 1, 10000 };
+    Random random = new Random();
 
-    private readonly string[] _wrongComments =
+    int RandomNumber(int min, int max)
     {
-        "Nope!", "Try again...", "Wrong!",
-        "Not even close 😴", "Nah.", "Keep trying..."
-    };
+        max++;
+        return random.Next(min, max);
+    }
 
     public void Run()
     {
-        ShowIntro();
-        int[] range = SelectDifficulty();
-        int secretNumber = _random.Next(range[0], range[1] + 1);
+        ConsolePrinter.PrintText("Hi! This is the \"Guess the Number\" game. Ready to start?");
+        ConsolePrinter.PrintText("Press the space to start.");
 
-        ConsolePrinter.Print("Ok, let's start the game!");
+        while (true)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(true);
+
+            if (key.Key == ConsoleKey.Spacebar)
+            {
+                break;
+            }
+        }
+
+        ConsolePrinter.PrintText("Choose a difficulty level: 1 (easy) to 3 (hard).");
+
+        int difficultyLevel = ConsolePrinter.ReadInt("Enter a number from 1 to 3.", 1, 3);
+
+        ConsolePrinter.PrintText($"You chose difficulty level {difficultyLevel}.");
+        int[] selectedRange;
+
+        if (difficultyLevel == 1)
+        {
+            selectedRange = easy;
+            ConsolePrinter.PrintText($"You chose Easy. I picked a number between {easy[0]} and {easy[1]}.");
+        }
+        else if (difficultyLevel == 2)
+        {
+            selectedRange = medium;
+            ConsolePrinter.PrintText($"You chose Medium. I picked a number between {medium[0]} and {medium[1]}.");
+        }
+        else
+        {
+            selectedRange = hard;
+            ConsolePrinter.PrintText($"You chose Hard. I picked a number between {hard[0]} and {hard[1]}.");
+        }
+
+        int secretNumber = RandomNumber(selectedRange[0], selectedRange[1]);
+
+        ConsolePrinter.PrintText("ok, let's start the game!");
         Console.Clear();
 
-        PlayRound(secretNumber);
-    }
-
-    private void ShowIntro()
-    {
-        ConsolePrinter.Print("Hi! This is the \"Guess the Number\" game. Ready to start?");
-        ConsolePrinter.Print("Press the space to start.");
-        ConsolePrinter.WaitForKey(ConsoleKey.Spacebar);
-    }
-
-    private int[] SelectDifficulty()
-    {
-        ConsolePrinter.Print("Choose a difficulty level: 1 (easy) to 3 (hard).");
-        int level = ConsolePrinter.ReadInt("", 1, 3);
-
-        int[] range = level switch
-        {
-            1 => _easy,
-            2 => _medium,
-            _ => _hard
-        };
-
-        ConsolePrinter.Print($"You chose difficulty level {level}.");
-        ConsolePrinter.Print($"I picked a number between {range[0]} and {range[1]}.");
-
-        return range;
-    }
-
-    private void PlayRound(int secretNumber)
-    {
         int attempts = 0;
+        string[] wrongComments = { "Nope!", "Try again...", "Wrong!", "Not even close 😴", "Nah.", "Keep trying..." };
 
         while (true)
         {
             string? input = Console.ReadLine();
+            int guess;
 
-            if (!int.TryParse(input, out int guess))
+            if (!int.TryParse(input, out guess))
             {
-                ConsolePrinter.Print("Enter a valid number!");
+                ConsolePrinter.PrintText("Enter a valid number!");
                 continue;
             }
 
@@ -69,16 +75,16 @@ public class GuessNumberGame
 
             if (guess < secretNumber)
             {
-                ConsolePrinter.Print($"{_wrongComments[attempts % _wrongComments.Length]} Too low!");
+                ConsolePrinter.PrintText($"{wrongComments[attempts % wrongComments.Length]} Too low!");
             }
             else if (guess > secretNumber)
             {
-                ConsolePrinter.Print($"{_wrongComments[attempts % _wrongComments.Length]} Too high!");
+                ConsolePrinter.PrintText($"{wrongComments[attempts % wrongComments.Length]} Too high!");
             }
             else
             {
-                ConsolePrinter.Print($"Correct! The number was {secretNumber}.");
-                ConsolePrinter.Print($"You guessed it in {attempts} attempts!");
+                ConsolePrinter.PrintText($"Correct! The number was {secretNumber}.");
+                ConsolePrinter.PrintText($"You guessed it in {attempts} attempts!");
                 break;
             }
         }
